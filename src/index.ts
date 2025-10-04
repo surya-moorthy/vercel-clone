@@ -4,7 +4,13 @@ import cors from "cors"
 import simpleGit from "simple-git";
 import path from "path";
 import { getAllfiles } from "./utils/getFiles";
-import { uploadFile } from "./utils/uploadFile";
+import { createClient } from "redis";
+
+const publisher = createClient({
+    url: "redis://localhost:6379"
+});
+publisher.connect();
+
 const app = express();
 
 
@@ -19,9 +25,12 @@ app.post("/deploy", async (req : Request ,res : Response) => {
 
     const files = await getAllfiles(path.join(__dirname,`output/${repoid}`));
 
-     files.forEach(async (file)=> {
-         await uploadFile(file.slice(__dirname.length + 1),file);
-     })
+    //  files.forEach(async (file)=> {
+    //      await uploadFile(file.slice(__dirname.length + 1),file);
+    //  })
+
+     publisher.lPush("build-queue",repoid);
+     
     res.json({
         id : repoid
     })

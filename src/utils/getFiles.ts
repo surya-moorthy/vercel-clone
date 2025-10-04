@@ -7,6 +7,7 @@ export const getAllfiles = async (dir: string): Promise<string[]> => {
 
   for (const item of items) {
     const fullPath = path.join(dir, item.name);
+    console.log("file path:",fullPath);
     if (item.isDirectory()) {
       const subFiles = await getAllfiles(fullPath);
       files = files.concat(subFiles);
